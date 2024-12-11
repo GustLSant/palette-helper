@@ -2,71 +2,6 @@ import React from 'react'
 import { HslColor, HslColorPicker } from "react-colorful";
 import ColorBox from '../components/ColorBox';
 
-/*
-function hexToHsv(hex:string):[number, number, number] {
-    hex = hex.replace(/^#/, ''); // remove o símbolo '#' se estiver presente
-    const r = parseInt(hex.substring(0, 2), 16) / 255;
-    const g = parseInt(hex.substring(2, 4), 16) / 255;
-    const b = parseInt(hex.substring(4, 6), 16) / 255;
-
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    const delta = max - min;
-
-    let h = 0;
-    const s = (max === 0) ? 0 : delta/max;
-    const v = max;
-
-    if (delta !== 0) {
-      switch (max) {
-        case r: h = (g - b) / delta + (g < b ? 6 : 0); break;
-        case g: h = (b - r) / delta + 2; break;
-        case b: h = (r - g) / delta + 4; break;
-      }
-      h = h/6;
-    }
-
-    return [h * 360, s * 100, v * 100];
-}
-
-
-function hsvToHex(h:number, s:number, v:number):string {
-    s /= 100;
-    v /= 100;
-
-    const c = v * s;
-    const x = c * (1 - Math.abs((h / 60) % 2 - 1));
-    const m = v - c;
-
-    let r = 0;
-    let g = 0;
-    let b = 0;
-
-    if (h >= 0 && h < 60) {
-        r = c; g = x; b = 0;
-    } else if (h >= 60 && h < 120) {
-        r = x; g = c; b = 0;
-    } else if (h >= 120 && h < 180) {
-        r = 0; g = c; b = x;
-    } else if (h >= 180 && h < 240) {
-        r = 0; g = x; b = c;
-    } else if (h >= 240 && h < 300) {
-        r = x; g = 0; b = c;
-    } else {
-        r = c; g = 0; b = x;
-    }
-
-    r = Math.round((r + m) * 255);
-    g = Math.round((g + m) * 255);
-    b = Math.round((b + m) * 255);
-
-    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
-}
-*/
-
-function clamp(num: number, lower: number, upper: number) {
-    return Math.min(Math.max(num, lower), upper);
-}
 
 
 function getAbsoluteHueValue(_value:number):number{
@@ -113,6 +48,9 @@ function hslToHex(_color:HslColor):string{
 }
 
 
+// hue do amarelo: 60
+// hue do azul: 240
+
 
 export default function MainPage(){
     const [currentColor, setCurrentColor] = React.useState<HslColor>({h: 120.0, s: 75.0, l: 45.0})
@@ -122,47 +60,49 @@ export default function MainPage(){
     const [paletteColors, setPaletteColors] = React.useState<HslColor[]>([])
     
     const [colorCount, setColorCount] = React.useState<number>(5)
-    const [hueShifting, setHueShifting] = React.useState<number>(15.0)
+    const [hueShifting, setHueShifting] = React.useState<number>(10.0)
     const [saturationShifting, setSaturationShifting] = React.useState<number>(5.0)
     const [lightnessShifting, setLightnessShifting] = React.useState<number>(5.0)
 
     const maxHistoricSize:number = 20
 
 
+    function getNextColor(_color:HslColor, _step:number, _lighterOrDarker:number):HslColor{
+        let hueDirection:number = 0.0;
+        
+        // para cores mais claras, _lighterOrDarker = 1.0, para cores mais escuras, = -1.0
+
+        // para definir se a cor mais clara esta a direita da cor atual ou a esquerda (os tons mais claros tendem pro amarelo)
+        const clockwise = (60.0 - _color.h + 360) % 360;
+        const counterClockwise = (_color.h - 60.0 + 360) % 360;
+        if (clockwise < counterClockwise) { hueDirection = 1.0 * _lighterOrDarker; } // a cor esta a esquerda do amarelo
+        else { hueDirection = -1.0 * _lighterOrDarker; }                             // a cor esta a direita do amarelo
+
+        const shiftedHue:number = getAbsoluteHueValue((_color.h + hueShifting*_step*hueDirection) % 360);
+        
+        // clamp para nao passar do amarelo
+        // if(clockwise < counterClockwise){ shiftedHue = Math.min(shiftedHue, 60.0); }
+        // else{ shiftedHue = Math.max(shiftedHue, 60.0); }
+    
+        const shiftedSaturation:number = _color.s + saturationShifting*_step*_lighterOrDarker;
+        const shiftedLightness:number = _color.l + lightnessShifting*_step*_lighterOrDarker
+        const shiftedColor:HslColor = {h:  shiftedHue, s: shiftedSaturation, l: shiftedLightness};
+    
+        return shiftedColor;
+    }
+
+
     function handleChangeCurrentColor(_newColor:HslColor):void{
         setCurrentColor(_newColor)
-        let newCurrentColorsArray:HslColor[] = []
+        const newCurrentColorsArray:HslColor[] = []
         const middleIdx:number = Math.floor(colorCount/2.0)
 
-        // hue do amarelo: 60
-        // hue do azul: 240
-
-        // cores mais claras (o meio ate o inicio)
-        for(let i=middleIdx; i>0; i--){
-            // const shiftedHue:number = clamp((_newColor.h - hueShifting*i) % 360, 20.0, 240.0);
-            const hueDirection:number = -1//(_newColor.h < 60.0) ? 1 : -1
-            const shiftedHue:number = getAbsoluteHueValue((_newColor.h + hueShifting*i*hueDirection) % 360); // aqui o hue tem q diminuir
-            const shiftedSaturation:number = _newColor.s + saturationShifting*i;
-            const shiftedLightness:number = _newColor.l + lightnessShifting*i
-            const shiftedColor:HslColor = {h:  shiftedHue, s: shiftedSaturation, l: shiftedLightness};
-
-            newCurrentColorsArray.push(shiftedColor)
-        }
+        for(let i=middleIdx; i>0; i--){ newCurrentColorsArray.push(getNextColor(_newColor, i, 1.0)); } // cores mais claras (o meio ate o inicio)
 
         newCurrentColorsArray.push(_newColor) // cor do meio
 
-        // cores mais escuras (do meio ate o final)
-        for(let i=middleIdx+1; i<colorCount; i++){
-            const hueDirection:number = 1//(_newColor.h > 240.0) ? -1 : +1
-            const shiftedHue:number = getAbsoluteHueValue((_newColor.h + hueShifting*i*hueDirection) % 360); // aqui o hue tem q diminuir
-            const shiftedSaturation:number = _newColor.s - saturationShifting*i;
-            const shiftedLightness:number = _newColor.l - lightnessShifting*i
-            const shiftedColor:HslColor = {h:  shiftedHue, s: shiftedSaturation, l: shiftedLightness};
+        for(let i=middleIdx+1; i<colorCount; i++){ newCurrentColorsArray.push(getNextColor(_newColor, i, -1.0)); } // cores mais escuras (do meio ate o final)
 
-            newCurrentColorsArray.push(shiftedColor)
-        }
-
-        // newCurrentColorsArray = newCurrentColorsArray.reverse()
         setCurrentColorsArray(newCurrentColorsArray)
 
         // atualizando o array de cores no formato HEX (para o preview e gradiente)
