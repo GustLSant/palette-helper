@@ -1,6 +1,7 @@
 import React from 'react'
 import { HslColor, HslColorPicker } from "react-colorful";
 import ColorBox from '../components/ColorBox';
+import ConfigurationContainer from '../components/ConfigurationContainer';
 
 
 
@@ -42,7 +43,7 @@ export default function MainPage(){
     const [colorCount, setColorCount] = React.useState<number>(5)
     const [hueShifting, setHueShifting] = React.useState<number>(10.0)
     const [saturationShifting, setSaturationShifting] = React.useState<number>(5.0)
-    const [lightnessShifting, setLightnessShifting] = React.useState<number>(5.0)
+    const [lightnessShifting, setLightnessShifting] = React.useState<number>(2.0)
 
     const maxHistoricSize:number = 20
 
@@ -109,6 +110,8 @@ export default function MainPage(){
         setColorCount((prev)=>{return prev+_increment})
     }
 
+    
+
 
     React.useEffect(()=>{
         handleChangeCurrentColor(currentColor) // atualizando a cor atual apos mudar o tamanho do gradiente
@@ -121,10 +124,10 @@ export default function MainPage(){
                 <h1 className='font-pixel text-5xl text-center'>Palette Helper</h1>
             </div>
 
-            <div className='flex w-full items-start gap-6 px-4'>
+            <div className='flex w-full items-stretch gap-6 px-4'>
 
-                <div className='main-page__section flex flex-col gap-4'>
-                    <div>
+                <div className='flex flex-col gap-4 justify-start'>
+                    <div className='main-page__mini-section'>
                         <p className='main-page__text-section'>Historic:</p>
                         <div className='flex flex-wrap'>
                             {
@@ -137,14 +140,11 @@ export default function MainPage(){
                         </div>
                     </div>
 
-                    <div>
-                        <p className='text-sm font-pixel'>Color Count in Gradient: </p>
-                        <div className='flex gap-2 items-center'>
-                            <button className='bg-gray-500 basis-8 text-white text-2xl' onClick={()=>{handleClickButtonColorCount(-1)}}>&minus;</button>
-                            <p className='text-center text-xl font-pixel'>{colorCount}</p>
-                            <button className='bg-gray-500 basis-8 text-white text-2xl' onClick={()=>{handleClickButtonColorCount(+1)}}>+</button>
-                        </div>
-                    </div>
+                    <ConfigurationContainer label='Color Count in Gradient: ' value={colorCount} setterFunction={handleClickButtonColorCount} />
+
+                    <ConfigurationContainer label='Hue Shifting Value: ' value={hueShifting} setterFunction={handleClickButtonColorCount} />
+                    
+                    <ConfigurationContainer label='Lightness Shifting Value: ' value={hueShifting} setterFunction={handleClickButtonColorCount} />
                 </div>
                 
                 <div className='flex flex-col basis-200px grow gap-2'>

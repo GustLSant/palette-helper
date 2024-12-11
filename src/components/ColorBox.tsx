@@ -1,7 +1,7 @@
 import { HslColor } from "react-colorful";
 
 
-interface Props {
+interface ColorBoxProps {
     hslColor: HslColor; // Define a prop 'color' como uma string
     hexColor: string;
     handleChangeCurrentColor: (_newColor:HslColor) => void;
@@ -9,7 +9,7 @@ interface Props {
 }
 
 
-export default function ColorBox({hslColor, hexColor, handleChangeCurrentColor, isMainColor}:Props){
+export default function ColorBox({hslColor, hexColor, handleChangeCurrentColor, isMainColor}:ColorBoxProps){
 
     function handleClickColor():void{
         handleChangeCurrentColor(hslColor)

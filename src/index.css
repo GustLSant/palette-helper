@@ -3,7 +3,11 @@
 @tailwind utilities;
 
 .main-page__section{
-    @apply basis-200px grow p-4 bg-gray-50 rounded-lg shadow-md;
+    @apply basis-200px grow p-4 bg-gray-50 rounded-lg shadow-md flex flex-col gap-4;
+}
+
+.main-page__mini-section{
+    @apply p-4 bg-gray-50 rounded-lg shadow-md flex flex-col gap-4;
 }
 
 .main-page__text-section{
