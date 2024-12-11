@@ -1,7 +1,7 @@
 import React from 'react'
 import { HslColor, HslColorPicker } from "react-colorful";
 import ColorBox from '../components/ColorBox';
-import ConfigurationContainer from '../components/ConfigurationContainer';
+import ConfigContainer from '../components/ConfigContainer';
 
 
 
@@ -41,8 +41,8 @@ export default function MainPage(){
     const [paletteColors, setPaletteColors] = React.useState<HslColor[]>([])
     
     const [colorCount, setColorCount] = React.useState<number>(5)
-    const [hueShifting, setHueShifting] = React.useState<number>(10.0)
-    const [saturationShifting, setSaturationShifting] = React.useState<number>(5.0)
+    const [hueShifting, setHueShifting] = React.useState<number>(8.0)
+    const [saturationShifting, setSaturationShifting] = React.useState<number>(6.0)
     const [lightnessShifting, setLightnessShifting] = React.useState<number>(2.0)
 
     const maxHistoricSize:number = 20
@@ -110,12 +110,31 @@ export default function MainPage(){
         setColorCount((prev)=>{return prev+_increment})
     }
 
-    
+    function handleClickShiftingButton(_shiftingType:string, _increment:number):void{
+        switch(_shiftingType){
+            case 'hue' : {
+                setHueShifting((prev)=>{return (prev + _increment)});
+                break;
+            }
+            case 'sat' : {
+                setSaturationShifting((prev)=>{return (prev + _increment)});
+                break;
+            }
+            case 'lig' : {
+                setLightnessShifting((prev)=>{return (prev + _increment)});
+                break;
+            }
+            default: { 
+                console.error("default case do handleClickShiftingButton")
+                break; 
+            } 
+        }
+    }
 
 
     React.useEffect(()=>{
         handleChangeCurrentColor(currentColor) // atualizando a cor atual apos mudar o tamanho do gradiente
-    }, [colorCount])
+    }, [colorCount, hueShifting, saturationShifting, lightnessShifting])
 
 
     return(
@@ -140,11 +159,20 @@ export default function MainPage(){
                         </div>
                     </div>
 
-                    <ConfigurationContainer label='Color Count in Gradient: ' value={colorCount} setterFunction={handleClickButtonColorCount} />
+                    <div className='main-page__mini-section'>
+                        <p className='text-sm font-pixel'>Color Count in Gradient: </p>
+                        <div className='flex gap-2 items-center'>
+                            <button className='bg-gray-400 basis-8 text-white text-2xl' onClick={()=>{handleClickButtonColorCount(-1)}}>&minus;</button>
+                            <p className='text-center text-xl font-pixel'>{colorCount}</p>
+                            <button className='bg-gray-400 basis-8 text-white text-2xl' onClick={()=>{handleClickButtonColorCount(1)}}>+</button>
+                        </div>
+                    </div>
 
-                    <ConfigurationContainer label='Hue Shifting Value: ' value={hueShifting} setterFunction={handleClickButtonColorCount} />
+                    <ConfigContainer label='Hue Shifting Value: ' type={'hue'} value={hueShifting} setterFunction={handleClickShiftingButton} increment={4} />
                     
-                    <ConfigurationContainer label='Lightness Shifting Value: ' value={hueShifting} setterFunction={handleClickButtonColorCount} />
+                    <ConfigContainer label='Saturation Shifting Value: ' type={'sat'} value={saturationShifting} setterFunction={handleClickShiftingButton} increment={2} />
+
+                    <ConfigContainer label='Lightness Shifting Value: ' type={'lig'} value={lightnessShifting} setterFunction={handleClickShiftingButton} increment={1} />
                 </div>
                 
                 <div className='flex flex-col basis-200px grow gap-2'>
