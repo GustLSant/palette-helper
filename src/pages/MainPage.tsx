@@ -1,33 +1,12 @@
 import React from 'react'
 import { HslColor, HslColorPicker } from "react-colorful";
+import { getAbsoluteHueValue, hslToHex } from '../tools/ColorTools';
 import ColorBox from '../components/ColorBox';
 import ConfigContainer from '../components/ConfigContainer';
+import HistoricSection from '../components/HistoricSection';
+import { BiTransfer } from "react-icons/bi";
+import { BiShapeTriangle } from "react-icons/bi";
 
-
-
-function getAbsoluteHueValue(_value:number):number{
-    if(_value < 0.0){ return 360.0 + _value}
-    else if(_value > 360.0){ return 360.0 - _value }
-    else{ return _value }
-}
-
-
-function hslToHex(_color:HslColor):string{
-    const h = _color.h;
-    const s = _color.s / 100;
-    const l = _color.l / 100;
-
-    const a = s * Math.min(l, 1 - l);
-    const f = (n:number) => {
-        const k = (n + h / 30) % 12;
-        const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-        return Math.round(255 * Math.min(Math.max(color, 0), 1)) // Clamp between 0 and 1
-            .toString(16)
-            .padStart(2, "0");
-    };
-
-    return `#${f(0)}${f(8)}${f(4)}`;
-}
 
 // hue do amarelo: 60
 // hue do azul: 240
@@ -37,15 +16,17 @@ export default function MainPage(){
     const [currentColor, setCurrentColor] = React.useState<HslColor>({h: 120.0, s: 75.0, l: 45.0})
     const [currentColorsArray, setCurrentColorsArray] = React.useState<HslColor[]>([])
     const [currentHexColorsArray, setCurrentHexColorsArray] = React.useState<string[]>([])
-    const [historicColors, setHistoricColors] = React.useState<HslColor[]>([])
+    const [mouseUpWatcher, setMouseUpWatcher] = React.useState<number>(0)
     const [paletteColors, setPaletteColors] = React.useState<HslColor[]>([])
     
-    const [colorCount, setColorCount] = React.useState<number>(5)
-    const [hueShifting, setHueShifting] = React.useState<number>(8.0)
-    const [saturationShifting, setSaturationShifting] = React.useState<number>(6.0)
-    const [lightnessShifting, setLightnessShifting] = React.useState<number>(2.0)
+    const defaultHueShifting:number = 8.0;
+    const defaultSaturationShifting:number = 6.0;
+    const defaultLightnessShifting:number = 2.0;
 
-    const maxHistoricSize:number = 20
+    const [colorCount, setColorCount] = React.useState<number>(5)
+    const [hueShifting, setHueShifting] = React.useState<number>(defaultHueShifting)
+    const [saturationShifting, setSaturationShifting] = React.useState<number>(defaultSaturationShifting)
+    const [lightnessShifting, setLightnessShifting] = React.useState<number>(defaultLightnessShifting)
 
 
     function getNextColor(_color:HslColor, _step:number, _lighterOrDarker:number):HslColor{
@@ -93,35 +74,44 @@ export default function MainPage(){
     }
 
 
-    function handleMouseUp():void{
-        const newHistoricColors:HslColor[] = [...historicColors]
-        if(newHistoricColors.length < maxHistoricSize){ newHistoricColors.push(currentColor) }
-        else{
-            newHistoricColors.shift()
-            newHistoricColors.push(currentColor)
-        }
-        setHistoricColors(newHistoricColors)
-    }
-
-
     function handleClickButtonColorCount(_increment:number):void{
         if(colorCount == 3 && _increment < 0){ return }
         else if(colorCount == 15 && _increment > 0){ return }
         setColorCount((prev)=>{return prev+_increment})
     }
 
-    function handleClickShiftingButton(_shiftingType:string, _increment:number):void{
+    function handleConfigSliderChange(_shiftingType:string, value:number):void{
         switch(_shiftingType){
             case 'hue' : {
-                setHueShifting((prev)=>{return (prev + _increment)});
+                setHueShifting(value);
                 break;
             }
             case 'sat' : {
-                setSaturationShifting((prev)=>{return (prev + _increment)});
+                setSaturationShifting(value);
                 break;
             }
             case 'lig' : {
-                setLightnessShifting((prev)=>{return (prev + _increment)});
+                setLightnessShifting(value);
+                break;
+            }
+            default: { 
+                console.error("default case do handleClickShiftingButton")
+                break; 
+            } 
+        }
+    }
+    function handleClickResetShiftingButton(_shiftingType:string):void{
+        switch(_shiftingType){
+            case 'hue' : {
+                setHueShifting(defaultHueShifting);
+                break;
+            }
+            case 'sat' : {
+                setSaturationShifting(defaultSaturationShifting);
+                break;
+            }
+            case 'lig' : {
+                setLightnessShifting(defaultLightnessShifting);
                 break;
             }
             default: { 
@@ -137,20 +127,140 @@ export default function MainPage(){
     }, [colorCount, hueShifting, saturationShifting, lightnessShifting])
 
 
+    function handleChangeSliderSaturation(e:React.ChangeEvent<HTMLInputElement>):void{
+        const updatedColor:HslColor = {
+            h: currentColor.h,
+            s: Number(e.target.value),
+            l: currentColor.l
+        }
+        handleChangeCurrentColor(updatedColor);
+    }
+
+    function handleChangeSliderLightness(e:React.ChangeEvent<HTMLInputElement>):void{
+        const updatedColor:HslColor = {
+            h: currentColor.h,
+            s: currentColor.s,
+            l: Number(e.target.value)
+        }
+        handleChangeCurrentColor(updatedColor);
+    }
+
+
+    function handleClickSelectComplementary():void{
+        const newColor:HslColor = {
+            h: currentColor.h,
+            s: currentColor.s,
+            l: currentColor.l
+        }
+        newColor.h = getAbsoluteHueValue(newColor.h + 180);
+        handleChangeCurrentColor(newColor);
+    }
+    function handleClickSelectTriadic():void{
+        const newColor:HslColor = {
+            h: currentColor.h,
+            s: currentColor.s,
+            l: currentColor.l
+        }
+        newColor.h = getAbsoluteHueValue(newColor.h + 120);
+        handleChangeCurrentColor(newColor);
+    }
+
+    
     return(
-        <>
-            <div className='flex justify-center items-center min-h-28 mb-20 bg-white shadow-md'>
-                <h1 className='font-pixel text-5xl text-center'>Palette Helper</h1>
+        <div className='flex flex-col gap-12'>
+            <div className='flex justify-center items-center min-h-28 bg-white shadow-md'>
+                <h1 className='text-5xl text-center'>Palette Helper</h1>
             </div>
 
             <div className='flex w-full items-stretch gap-6 px-4'>
 
-                <div className='flex flex-col gap-4 justify-start'>
+                <section className='flex flex-col gap-4 justify-start basis-200px grow'>
+                    
+                    <HistoricSection currentColor={currentColor} mouseUpWatcher={mouseUpWatcher} handleChangeCurrentColor={handleChangeCurrentColor} />
+
                     <div className='main-page__mini-section'>
-                        <p className='main-page__text-section'>Historic:</p>
+                        <p className='text-lg'>Color Count in Gradient: </p>
+                        <div className='flex gap-2 items-center'>
+                            <button className='bg-gray-400 basis-8 text-white text-2xl' onClick={()=>{handleClickButtonColorCount(-1)}}>&minus;</button>
+                            <p className='text-center text-xl'>{colorCount}</p>
+                            <button className='bg-gray-400 basis-8 text-white text-2xl' onClick={()=>{handleClickButtonColorCount(1)}}>+</button>
+                        </div>
+                    </div>
+
+                    <ConfigContainer label='Hue Shifting Value: ' type={'hue'} value={hueShifting} maxValue={50} step={2} setterFunction={handleConfigSliderChange} resetFunction={handleClickResetShiftingButton} />
+                    
+                    <ConfigContainer label='Saturation Shifting Value: ' type={'sat'} value={saturationShifting} maxValue={50} step={2} setterFunction={handleConfigSliderChange} resetFunction={handleClickResetShiftingButton} />
+
+                    <ConfigContainer label='Lightness Shifting Value: ' type={'lig'} value={lightnessShifting} maxValue={20} step={2} setterFunction={handleConfigSliderChange} resetFunction={handleClickResetShiftingButton} />
+                </section>
+                
+                <section className='flex flex-col basis-200px grow gap-2'>
+                    <HslColorPicker className='grow !w-auto shadow-md' onMouseUp={()=>{setMouseUpWatcher((prev)=>{if(prev === 1000){return 0}else{return prev+1}})}} color={currentColor} onChange={(newColor:HslColor)=>{handleChangeCurrentColor(newColor)}} />
+                    
+                    <div className="main-page__mini-section">
+                        <div className='flex flex-col gap-2'>
+                            <p>Selected Color:</p>
+                            <div className='flex gap-2 items-center'>
+                                <div className='w-8 h-8 shadow-md' style={{backgroundColor: hslToHex(currentColor)}} />
+                                <p>{hslToHex(currentColor)}</p>
+                            </div>
+                        </div>
+
+                        <div className='flex flex-col gap-2'>
+                            <div className='flex justify-between'>
+                                <p>HUE:</p>
+                                <p>{currentColor.h}º</p>
+                            </div>
+                            <div>
+                                <div className='flex justify-between'>
+                                    <p>Saturation:</p>
+                                    <p>{currentColor.s}</p>
+                                </div>
+                                <input className='w-full' value={currentColor.s} onChange={handleChangeSliderSaturation} max={100} min={0} type="range" name="input-range-sat" id="input-range-sat" />
+                            </div>
+                            <div>
+                                <div className='flex justify-between'>
+                                    <p>Lightness:</p>
+                                    <p>{currentColor.l}</p>
+                                </div>
+                                <input className='w-full' value={currentColor.l} onChange={handleChangeSliderLightness} max={100} min={0} type="range" name="input-range-lig" id="input-range-lig" />
+                            </div>
+                        </div>
+
+                        <div className='flex justify-center max-w-[30vw] overflow-x-auto'>
+                            {
+                                currentColorsArray.map((item, key)=>{
+                                    return(
+                                        <ColorBox key={key} hslColor={item} hexColor={hslToHex(item)} handleChangeCurrentColor={handleChangeCurrentColor} isMainColor={item == currentColor} />
+                                    )
+                                })
+                            }
+                        </div>
+                        
+
+                        <div className='flex p-1 gap-1 items-center'>
+                            <div className='bg-gray-400 p-1 text-white rounded-md text-xl shadow-md hover:cursor-pointer' onClick={handleClickSelectComplementary}>
+                                <BiTransfer  />
+                            </div>
+                            <p>Select Complementary Color</p>
+                        </div>
+
+                        <div className='flex p-1 gap-1 items-center'>
+                            <div className='bg-gray-400 p-1 text-white rounded-md text-xl shadow-md hover:cursor-pointer' onClick={handleClickSelectTriadic}>
+                                <BiShapeTriangle  />
+                            </div>
+                            <p>Select Next Triadic Color</p>
+                        </div>
+                    </div>
+                </section>
+                
+                
+                <section className='flex flex-col gap-4 justify-start basis-200px grow'>
+                    <div className='main-page__mini-section'>
+                        <p className='main-page__text-section'>Palette:</p>
                         <div className='flex flex-wrap'>
                             {
-                                historicColors.map((item, key)=>{
+                                paletteColors.map((item, key)=>{
                                     return(
                                         <ColorBox key={key} hslColor={item} hexColor={hslToHex(item)} handleChangeCurrentColor={handleChangeCurrentColor} />
                                     )
@@ -158,59 +268,23 @@ export default function MainPage(){
                             }
                         </div>
                     </div>
-
+                    
                     <div className='main-page__mini-section'>
-                        <p className='text-sm font-pixel'>Color Count in Gradient: </p>
-                        <div className='flex gap-2 items-center'>
-                            <button className='bg-gray-400 basis-8 text-white text-2xl' onClick={()=>{handleClickButtonColorCount(-1)}}>&minus;</button>
-                            <p className='text-center text-xl font-pixel'>{colorCount}</p>
-                            <button className='bg-gray-400 basis-8 text-white text-2xl' onClick={()=>{handleClickButtonColorCount(1)}}>+</button>
+                        <p className='main-page__text-section'>Preview:</p>
+
+                        <div className='w-full h-6' style={{backgroundImage: `linear-gradient(to right, ${currentHexColorsArray.join(', ')})`}}></div>
+
+                        <div className='overflow-hidden flex justify-center items-center p-6  mx-12 aspect-square rounded-md bg-gray-300' style={{boxShadow: '4px 4px 4px rgba(0,0,0, 0.25) inset', zIndex: 1}}>
+                            {/* esfera */}
+                            <div className='relative w-full aspect-square rounded-full' style={{backgroundPosition: 'top left', backgroundImage: `radial-gradient(at 35% 35%, ${currentHexColorsArray.join(', ')})`}}>
+                                {/* sombra */}
+                                <div className='absolute w-[80%] aspect-square rounded-full bottom-[-30%] right-0' style={{backgroundImage: 'radial-gradient(rgba(0,0,0, 0.4), rgba(0,0,0, 0.4), rgba(0,0,0, 0.3), transparent)', zIndex: -1, transform: 'scaleY(0.4)'}} />
+                            </div>
                         </div>
                     </div>
-
-                    <ConfigContainer label='Hue Shifting Value: ' type={'hue'} value={hueShifting} setterFunction={handleClickShiftingButton} increment={4} />
-                    
-                    <ConfigContainer label='Saturation Shifting Value: ' type={'sat'} value={saturationShifting} setterFunction={handleClickShiftingButton} increment={2} />
-
-                    <ConfigContainer label='Lightness Shifting Value: ' type={'lig'} value={lightnessShifting} setterFunction={handleClickShiftingButton} increment={1} />
-                </div>
-                
-                <div className='flex flex-col basis-200px grow gap-2'>
-                    <HslColorPicker className='grow !w-auto' onMouseUp={()=>{handleMouseUp()}} color={currentColor} onChange={(newColor:HslColor)=>{handleChangeCurrentColor(newColor)}} />
-                    
-                    <div className='w-full h-6' style={{backgroundImage: `linear-gradient(to right, ${currentHexColorsArray.join(', ')})`}}></div>
-                
-                    <div className='main-page__section'>
-                        <p>Preview:</p>
-                        <div className=' w-16 h-16 rounded-full' style={{backgroundPosition: 'top left', backgroundImage: `radial-gradient(at 35% 35%, ${currentHexColorsArray.join(', ')})`}} />
-                    </div>
-                            
-                    <div className='flex justify-center'>
-                        {
-                            currentColorsArray.map((item, key)=>{
-                                return(
-                                    <ColorBox key={key} hslColor={item} hexColor={hslToHex(item)} handleChangeCurrentColor={handleChangeCurrentColor} isMainColor={item == currentColor} />
-                                )
-                            })
-                        }
-                    </div>
-                </div>
-                
-                
-                <div className='main-page__section'>
-                    <p className='main-page__text-section'>Palette:</p>
-                    <div className='flex flex-wrap'>
-                        {
-                            paletteColors.map((item, key)=>{
-                                return(
-                                    <ColorBox key={key} hslColor={item} hexColor={hslToHex(item)} handleChangeCurrentColor={handleChangeCurrentColor} />
-                                )
-                            })
-                        }
-                    </div>
-                </div>
+                </section>
 
             </div>
-        </>
+        </div>
     )
 }

@@ -6,7 +6,7 @@ import './output.css'
 
 function App(){
   return(
-    <div className='flex flex-col h-screen overflow-y-auto bg-gray-200'>
+    <div className='min-h-screen pb-6 bg-gray-200'>
       <MainPage />
     </div>
   )

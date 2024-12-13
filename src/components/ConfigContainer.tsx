@@ -1,26 +1,31 @@
+import React from "react";
+import { BiReset } from "react-icons/bi";
+
 
 interface ConfigContainerProps {
     label:string;
     type:string;
     value:number;
-    setterFunction: (_type:string, _increment:number) => void;
-    increment:number;
+    maxValue:number;
+    step: number;
+    setterFunction: (_type:string, _value:number) => void;
+    resetFunction: (_type:string) => void;
 }
 
 
 
-export default function ConfigContainer({label, type, value, setterFunction, increment} : ConfigContainerProps){
+export default function ConfigContainer({label, type, value, maxValue, step, setterFunction, resetFunction} : ConfigContainerProps){
 
 
     return(
         <div className='main-page__mini-section'>
             
-            <p className='text-sm font-pixel'>{ label }</p>
+            <p className='text-lg'>{ label }</p>
             
             <div className='flex gap-2 items-center'>
-                <button className='bg-gray-400 basis-8 text-white text-2xl' onClick={()=>{setterFunction(type, -increment)}}>&minus;</button>
-                <p className='text-center text-xl font-pixel'>{value}</p>
-                <button className='bg-gray-400 basis-8 text-white text-2xl' onClick={()=>{setterFunction(type, increment)}}>+</button>
+                <input className="grow" type="range" value={value} max={maxValue} step={step} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setterFunction(type, Number(e.target.value))}} /> 
+                <p>{value}</p>
+                <button className='bg-gray-400 p-1 rounded-md text-white text-2xl shadow-md hover:cursor-pointer' onClick={()=>{resetFunction(type)}}><BiReset /></button>
             </div>
 
         </div>
