@@ -25,7 +25,7 @@ export default function ConfigContainer({label, type, value, maxValue, step, set
             <div className='flex gap-2 items-center'>
                 <input className="grow" type="range" value={value} max={maxValue} step={step} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setterFunction(type, Number(e.target.value))}} /> 
                 <p>{value}</p>
-                <button className='bg-gray-400 p-1 rounded-md text-white text-2xl shadow-md hover:cursor-pointer' onClick={()=>{resetFunction(type)}}><BiReset /></button>
+                <button className='button-01' onClick={()=>{resetFunction(type)}}><BiReset /></button>
             </div>
 
         </div>

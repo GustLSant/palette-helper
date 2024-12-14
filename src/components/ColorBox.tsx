@@ -5,11 +5,11 @@ interface ColorBoxProps {
     hslColor: HslColor; // Define a prop 'color' como uma string
     hexColor: string;
     handleChangeCurrentColor: (_newColor:HslColor) => void;
-    isMainColor: boolean
+    isMainColor?: boolean;
 }
 
 
-export default function ColorBox({hslColor, hexColor, handleChangeCurrentColor, isMainColor}:ColorBoxProps){
+export default function ColorBox({hslColor, hexColor, handleChangeCurrentColor, isMainColor=false}:ColorBoxProps){
 
     function handleClickColor():void{
         handleChangeCurrentColor(hslColor)
@@ -22,7 +22,3 @@ export default function ColorBox({hslColor, hexColor, handleChangeCurrentColor, 
         </div>
     )
 }
-
-ColorBox.defaultProps = {
-    isMainColor: false,
-};

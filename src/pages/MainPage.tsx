@@ -4,6 +4,7 @@ import { getAbsoluteHueValue, hslToHex } from '../tools/ColorTools';
 import ColorBox from '../components/ColorBox';
 import ConfigContainer from '../components/ConfigContainer';
 import HistoricSection from '../components/HistoricSection';
+import PaletteSection from '../components/PaletteSection';
 import { BiTransfer } from "react-icons/bi";
 import { BiShapeTriangle } from "react-icons/bi";
 
@@ -17,11 +18,11 @@ export default function MainPage(){
     const [currentColorsArray, setCurrentColorsArray] = React.useState<HslColor[]>([])
     const [currentHexColorsArray, setCurrentHexColorsArray] = React.useState<string[]>([])
     const [mouseUpWatcher, setMouseUpWatcher] = React.useState<number>(0)
-    const [paletteColors, setPaletteColors] = React.useState<HslColor[]>([])
+
     
-    const defaultHueShifting:number = 8.0;
+    const defaultHueShifting:number = 12.0;
     const defaultSaturationShifting:number = 6.0;
-    const defaultLightnessShifting:number = 2.0;
+    const defaultLightnessShifting:number = 4.0;
 
     const [colorCount, setColorCount] = React.useState<number>(5)
     const [hueShifting, setHueShifting] = React.useState<number>(defaultHueShifting)
@@ -54,7 +55,7 @@ export default function MainPage(){
     }
 
 
-    function handleChangeCurrentColor(_newColor:HslColor):void{
+    function handleChangeCurrentColor(_newColor:HslColor, _updateMouseUpWatcher:boolean=false):void{
         setCurrentColor(_newColor)
         const newCurrentColorsArray:HslColor[] = []
         const middleIdx:number = Math.floor(colorCount/2.0)
@@ -63,7 +64,7 @@ export default function MainPage(){
 
         newCurrentColorsArray.push(_newColor) // cor do meio
 
-        for(let i=middleIdx+1; i<colorCount; i++){ newCurrentColorsArray.push(getNextColor(_newColor, i, -1.0)); } // cores mais escuras (do meio ate o final)
+        for(let i=1; i<colorCount-middleIdx; i++){ newCurrentColorsArray.push(getNextColor(_newColor, i, -1.0)); } // cores mais escuras (do meio ate o final)
 
         setCurrentColorsArray(newCurrentColorsArray)
 
@@ -71,6 +72,8 @@ export default function MainPage(){
         const newCurrentHexColorsArray:string[] = []
         newCurrentColorsArray.forEach((item)=>{ newCurrentHexColorsArray.push(hslToHex(item)) })
         setCurrentHexColorsArray(newCurrentHexColorsArray)
+
+        if(_updateMouseUpWatcher){ setMouseUpWatcher((prev)=>{if(prev === 1000){return 0}else{return prev+1}}) }
     }
 
 
@@ -153,7 +156,7 @@ export default function MainPage(){
             l: currentColor.l
         }
         newColor.h = getAbsoluteHueValue(newColor.h + 180);
-        handleChangeCurrentColor(newColor);
+        handleChangeCurrentColor(newColor, true);
     }
     function handleClickSelectTriadic():void{
         const newColor:HslColor = {
@@ -162,10 +165,12 @@ export default function MainPage(){
             l: currentColor.l
         }
         newColor.h = getAbsoluteHueValue(newColor.h + 120);
-        handleChangeCurrentColor(newColor);
+        handleChangeCurrentColor(newColor, true);
     }
 
     
+
+
     return(
         <div className='flex flex-col gap-12'>
             <div className='flex justify-center items-center min-h-28 bg-white shadow-md'>
@@ -181,15 +186,15 @@ export default function MainPage(){
                     <div className='main-page__mini-section'>
                         <p className='text-lg'>Color Count in Gradient: </p>
                         <div className='flex gap-2 items-center'>
-                            <button className='bg-gray-400 basis-8 text-white text-2xl' onClick={()=>{handleClickButtonColorCount(-1)}}>&minus;</button>
+                            <button className='button-01' onClick={()=>{handleClickButtonColorCount(-1)}}>&minus;</button>
                             <p className='text-center text-xl'>{colorCount}</p>
-                            <button className='bg-gray-400 basis-8 text-white text-2xl' onClick={()=>{handleClickButtonColorCount(1)}}>+</button>
+                            <button className='button-01' onClick={()=>{handleClickButtonColorCount(1)}}>+</button>
                         </div>
                     </div>
 
-                    <ConfigContainer label='Hue Shifting Value: ' type={'hue'} value={hueShifting} maxValue={50} step={2} setterFunction={handleConfigSliderChange} resetFunction={handleClickResetShiftingButton} />
+                    <ConfigContainer label='Hue Shifting Value: ' type={'hue'} value={hueShifting} maxValue={30} step={2} setterFunction={handleConfigSliderChange} resetFunction={handleClickResetShiftingButton} />
                     
-                    <ConfigContainer label='Saturation Shifting Value: ' type={'sat'} value={saturationShifting} maxValue={50} step={2} setterFunction={handleConfigSliderChange} resetFunction={handleClickResetShiftingButton} />
+                    <ConfigContainer label='Saturation Shifting Value: ' type={'sat'} value={saturationShifting} maxValue={30} step={2} setterFunction={handleConfigSliderChange} resetFunction={handleClickResetShiftingButton} />
 
                     <ConfigContainer label='Lightness Shifting Value: ' type={'lig'} value={lightnessShifting} maxValue={20} step={2} setterFunction={handleConfigSliderChange} resetFunction={handleClickResetShiftingButton} />
                 </section>
@@ -239,42 +244,32 @@ export default function MainPage(){
                         
 
                         <div className='flex p-1 gap-1 items-center'>
-                            <div className='bg-gray-400 p-1 text-white rounded-md text-xl shadow-md hover:cursor-pointer' onClick={handleClickSelectComplementary}>
+                            <div className='button-01' onClick={handleClickSelectComplementary}>
                                 <BiTransfer  />
                             </div>
                             <p>Select Complementary Color</p>
                         </div>
 
                         <div className='flex p-1 gap-1 items-center'>
-                            <div className='bg-gray-400 p-1 text-white rounded-md text-xl shadow-md hover:cursor-pointer' onClick={handleClickSelectTriadic}>
+                            <div className='button-01' onClick={handleClickSelectTriadic}>
                                 <BiShapeTriangle  />
                             </div>
                             <p>Select Next Triadic Color</p>
                         </div>
+                        
                     </div>
                 </section>
                 
                 
                 <section className='flex flex-col gap-4 justify-start basis-200px grow'>
-                    <div className='main-page__mini-section'>
-                        <p className='main-page__text-section'>Palette:</p>
-                        <div className='flex flex-wrap'>
-                            {
-                                paletteColors.map((item, key)=>{
-                                    return(
-                                        <ColorBox key={key} hslColor={item} hexColor={hslToHex(item)} handleChangeCurrentColor={handleChangeCurrentColor} />
-                                    )
-                                })
-                            }
-                        </div>
-                    </div>
+                    <PaletteSection currentColorsArray={currentColorsArray} handleChangeCurrentColor={handleChangeCurrentColor} />
                     
                     <div className='main-page__mini-section'>
                         <p className='main-page__text-section'>Preview:</p>
 
                         <div className='w-full h-6' style={{backgroundImage: `linear-gradient(to right, ${currentHexColorsArray.join(', ')})`}}></div>
 
-                        <div className='overflow-hidden flex justify-center items-center p-6  mx-12 aspect-square rounded-md bg-gray-300' style={{boxShadow: '4px 4px 4px rgba(0,0,0, 0.25) inset', zIndex: 1}}>
+                        <div className='overflow-hidden flex justify-center items-center p-6  mx-12 aspect-square max-w-[20vw] w-full self-center rounded-md bg-gray-300' style={{boxShadow: '4px 4px 4px rgba(0,0,0, 0.25) inset', zIndex: 1}}>
                             {/* esfera */}
                             <div className='relative w-full aspect-square rounded-full' style={{backgroundPosition: 'top left', backgroundImage: `radial-gradient(at 35% 35%, ${currentHexColorsArray.join(', ')})`}}>
                                 {/* sombra */}
