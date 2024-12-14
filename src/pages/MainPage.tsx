@@ -20,9 +20,9 @@ export default function MainPage(){
     const [mouseUpWatcher, setMouseUpWatcher] = React.useState<number>(0)
 
     
-    const defaultHueShifting:number = 12.0;
+    const defaultHueShifting:number = 18.0;
     const defaultSaturationShifting:number = 6.0;
-    const defaultLightnessShifting:number = 4.0;
+    const defaultLightnessShifting:number = 6.0;
 
     const [colorCount, setColorCount] = React.useState<number>(5)
     const [hueShifting, setHueShifting] = React.useState<number>(defaultHueShifting)
@@ -192,7 +192,7 @@ export default function MainPage(){
                         </div>
                     </div>
 
-                    <ConfigContainer label='Hue Shifting Value: ' type={'hue'} value={hueShifting} maxValue={30} step={2} setterFunction={handleConfigSliderChange} resetFunction={handleClickResetShiftingButton} />
+                    <ConfigContainer label='Hue Shifting Value: ' type={'hue'} value={hueShifting} maxValue={40} step={2} setterFunction={handleConfigSliderChange} resetFunction={handleClickResetShiftingButton} />
                     
                     <ConfigContainer label='Saturation Shifting Value: ' type={'sat'} value={saturationShifting} maxValue={30} step={2} setterFunction={handleConfigSliderChange} resetFunction={handleClickResetShiftingButton} />
 
@@ -273,7 +273,7 @@ export default function MainPage(){
                             {/* esfera */}
                             <div className='relative w-full aspect-square rounded-full' style={{backgroundPosition: 'top left', backgroundImage: `radial-gradient(at 35% 35%, ${currentHexColorsArray.join(', ')})`}}>
                                 {/* sombra */}
-                                <div className='absolute w-[80%] aspect-square rounded-full bottom-[-30%] right-0' style={{backgroundImage: 'radial-gradient(rgba(0,0,0, 0.4), rgba(0,0,0, 0.4), rgba(0,0,0, 0.3), transparent)', zIndex: -1, transform: 'scaleY(0.4)'}} />
+                                <div className='absolute w-[80%] aspect-square rounded-full bottom-[-30%] right-0' style={{backgroundImage: 'radial-gradient(rgba(0,0,0, 1.0), rgba(0,0,0, 0.6), rgba(0,0,0, 0.3), transparent)', zIndex: -1, transform: 'scaleY(0.4)'}} />
                             </div>
                         </div>
                     </div>
