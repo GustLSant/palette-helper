@@ -1,6 +1,6 @@
 import React from 'react'
 import { HslColor, HslColorPicker } from "react-colorful";
-import { getAbsoluteHueValue, hslToHex } from '../tools/ColorTools';
+import { clamp, getAbsoluteHueValue, hslToHex } from '../tools/ColorTools';
 import ColorBox from '../components/ColorBox';
 import ConfigContainer from '../components/ConfigContainer';
 import HistoricSection from '../components/HistoricSection';
@@ -30,26 +30,40 @@ export default function MainPage(){
     const [lightnessShifting, setLightnessShifting] = React.useState<number>(defaultLightnessShifting)
 
 
-    function getNextColor(_color:HslColor, _step:number, _lighterOrDarker:number):HslColor{
+    function getNextColor(_originalColor:HslColor, _step:number, _lighterOrDarker:number):HslColor{
         let hueDirection:number = 0.0;
         
         // para cores mais claras, _lighterOrDarker = 1.0, para cores mais escuras, = -1.0
 
         // para definir se a cor mais clara esta a direita da cor atual ou a esquerda (os tons mais claros tendem pro amarelo)
-        const clockwise = (60.0 - _color.h + 360) % 360;
-        const counterClockwise = (_color.h - 60.0 + 360) % 360;
+        const clockwise = (60.0 - _originalColor.h + 360) % 360;
+        const counterClockwise = (_originalColor.h - 60.0 + 360) % 360;
         if (clockwise < counterClockwise) { hueDirection = 1.0 * _lighterOrDarker; } // a cor esta a esquerda do amarelo
         else { hueDirection = -1.0 * _lighterOrDarker; }                             // a cor esta a direita do amarelo
 
-        const shiftedHue:number = getAbsoluteHueValue((_color.h + hueShifting*_step*hueDirection) % 360);
+        const absoluteShiftedHue:number = (_originalColor.h + hueShifting*_step*hueDirection); // hue sem respeitar o limite 0 ~ 360
+        let normalizedShiftedHue:number = 0.0;
+
+        if(_lighterOrDarker > 0){ // clareando
+            // limitando o valor do hue para o amarelo mesmo fora do intervalo [0-360] // intervalo geral do amarelo: -60 ~ 0 ~ 60 ~ 420
+            if(_originalColor.h < 60.0){ normalizedShiftedHue = clamp(absoluteShiftedHue, -60.0, 60.0); }
+            else if(_originalColor.h > 60.0){ normalizedShiftedHue = clamp(absoluteShiftedHue, 60.0, 420.0); }
+            else{ normalizedShiftedHue = 60.0; }
+        }
+        else{ // escurecendo
+            // limitando o valor do hue para o azul mesmo fora do intervalo [0-360] // intervalo geral do azul: -240 ~ 0 ~ 240 ~ 480
+            if(_originalColor.h < 240.0){ normalizedShiftedHue = clamp(absoluteShiftedHue, -240.0, 240.0); }
+            else if(_originalColor.h > 240.0){ normalizedShiftedHue = clamp(absoluteShiftedHue, 240.0, 480.0); }
+            else{ normalizedShiftedHue = 240.0; }
+        }
         
-        // clamp para nao passar do amarelo
-        // if(clockwise < counterClockwise){ shiftedHue = Math.min(shiftedHue, 60.0); }
-        // else{ shiftedHue = Math.max(shiftedHue, 60.0); }
+        // tratando o valor do hue caso esteja fora do limite [0-360]
+        if(normalizedShiftedHue < 0.0){ normalizedShiftedHue = Math.abs(normalizedShiftedHue); }
+        else if(normalizedShiftedHue > 360.0){ normalizedShiftedHue = normalizedShiftedHue % 360.0; }
     
-        const shiftedSaturation:number = _color.s + saturationShifting*_step*_lighterOrDarker;
-        const shiftedLightness:number = _color.l + lightnessShifting*_step*_lighterOrDarker
-        const shiftedColor:HslColor = {h:  shiftedHue, s: shiftedSaturation, l: shiftedLightness};
+        const shiftedSaturation:number = _originalColor.s + saturationShifting*_step*_lighterOrDarker;
+        const shiftedLightness:number = _originalColor.l + lightnessShifting*_step*_lighterOrDarker
+        const shiftedColor:HslColor = {h:  normalizedShiftedHue, s: shiftedSaturation, l: shiftedLightness};
     
         return shiftedColor;
     }
