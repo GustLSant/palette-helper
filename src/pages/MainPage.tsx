@@ -1,6 +1,6 @@
 import React from 'react'
 import { HslColor, HslColorPicker } from "react-colorful";
-import { clamp, getAbsoluteHueValue, hslToHex } from '../tools/ColorTools';
+import { clamp, getAbsoluteHueValue, hexToHsl, hslToHex } from '../tools/ColorTools';
 import ColorBox from '../components/ColorBox';
 import ConfigContainer from '../components/ConfigContainer';
 import HistoricSection from '../components/HistoricSection';
@@ -18,7 +18,7 @@ export default function MainPage(){
     const [currentColorsArray, setCurrentColorsArray] = React.useState<HslColor[]>([])
     const [currentHexColorsArray, setCurrentHexColorsArray] = React.useState<string[]>([])
     const [mouseUpWatcher, setMouseUpWatcher] = React.useState<number>(0)
-
+    const [selectedColorText, setSelectedColorText] = React.useState<string>('')
     
     const defaultHueShifting:number = 18.0;
     const defaultSaturationShifting:number = 6.0;
@@ -86,6 +86,8 @@ export default function MainPage(){
         const newCurrentHexColorsArray:string[] = []
         newCurrentColorsArray.forEach((item)=>{ newCurrentHexColorsArray.push(hslToHex(item)) })
         setCurrentHexColorsArray(newCurrentHexColorsArray)
+
+        setSelectedColorText(hslToHex(_newColor));
 
         if(_updateMouseUpWatcher){ setMouseUpWatcher((prev)=>{if(prev === 1000){return 0}else{return prev+1}}) }
     }
@@ -163,6 +165,16 @@ export default function MainPage(){
     }
 
 
+    function handleChangeInputSelectedColor(e:React.ChangeEvent<HTMLInputElement>):void{
+        const content:string = e.target.value.replace(/[^0-9a-fA-F#]/g, '');
+        const stringHasHashtag:number = Number(content.charAt(0) === '#');
+        if(content.length === 3+stringHasHashtag || content.length === 6+stringHasHashtag){
+            handleChangeCurrentColor(hexToHsl(content));
+        }
+        setSelectedColorText(content);
+    }
+
+
     function handleClickSelectComplementary():void{
         const newColor:HslColor = {
             h: currentColor.h,
@@ -221,7 +233,8 @@ export default function MainPage(){
                             <p>Selected Color:</p>
                             <div className='flex gap-2 items-center'>
                                 <div className='w-8 h-8 shadow-md' style={{backgroundColor: hslToHex(currentColor)}} />
-                                <p>{hslToHex(currentColor)}</p>
+                                <input type="text" className='bg-gray-300 rounded-sm p-1 px-2 focus:outline-none max-w-[150px]' value={selectedColorText} onChange={handleChangeInputSelectedColor} name="color-code-input" style={{boxShadow: '4px 4px 4px rgba(0,0,0, 0.2) inset'}} id="color-code-input" />
+                                {/* <p>{hslToHex(currentColor)}</p> */}
                             </div>
                         </div>
 
