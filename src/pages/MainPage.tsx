@@ -58,7 +58,7 @@ export default function MainPage(){
         }
         
         // tratando o valor do hue caso esteja fora do limite [0-360]
-        if(normalizedShiftedHue < 0.0){ normalizedShiftedHue = Math.abs(normalizedShiftedHue); }
+        if(normalizedShiftedHue < 0.0){ normalizedShiftedHue = ((normalizedShiftedHue % 360) + 360) % 360; }
         else if(normalizedShiftedHue > 360.0){ normalizedShiftedHue = normalizedShiftedHue % 360.0; }
     
         const shiftedSaturation:number = _originalColor.s + saturationShifting*_step*_lighterOrDarker;
@@ -191,9 +191,9 @@ export default function MainPage(){
                 <h1 className='text-5xl text-center'>Palette Helper</h1>
             </div>
 
-            <div className='flex w-full items-stretch gap-6 px-4'>
+            <div className='grid grid-cols-3 w-full gap-6 px-4'>
 
-                <section className='flex flex-col gap-4 justify-start basis-200px grow'>
+                <section className='flex flex-col gap-4 justify-start'>
                     
                     <HistoricSection currentColor={currentColor} mouseUpWatcher={mouseUpWatcher} handleChangeCurrentColor={handleChangeCurrentColor} />
 
@@ -213,7 +213,7 @@ export default function MainPage(){
                     <ConfigContainer label='Lightness Shifting Value: ' type={'lig'} value={lightnessShifting} maxValue={20} step={2} setterFunction={handleConfigSliderChange} resetFunction={handleClickResetShiftingButton} />
                 </section>
                 
-                <section className='flex flex-col basis-200px grow gap-2'>
+                <section className='flex flex-col gap-2'>
                     <HslColorPicker className='grow !w-auto shadow-md' onMouseUp={()=>{setMouseUpWatcher((prev)=>{if(prev === 1000){return 0}else{return prev+1}})}} color={currentColor} onChange={(newColor:HslColor)=>{handleChangeCurrentColor(newColor)}} />
                     
                     <div className="main-page__mini-section">
@@ -274,8 +274,7 @@ export default function MainPage(){
                     </div>
                 </section>
                 
-                
-                <section className='flex flex-col gap-4 justify-start basis-200px grow'>
+                <section className='flex flex-col gap-4 justify-start'>
                     <PaletteSection currentColorsArray={currentColorsArray} handleChangeCurrentColor={handleChangeCurrentColor} />
                     
                     <div className='main-page__mini-section'>
