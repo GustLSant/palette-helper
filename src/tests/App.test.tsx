@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom'
-import { render, screen, fireEvent } from "@testing-library/react"
+import { render, screen } from "@testing-library/react"
 import App from '../App'
 
 jest.mock('../assets/react.svg', () => 'test-file-stub');
