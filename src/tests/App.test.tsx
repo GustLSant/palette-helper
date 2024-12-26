@@ -1,15 +1,28 @@
 import '@testing-library/jest-dom'
-import { render } from "@testing-library/react"
+import { render, screen, fireEvent } from "@testing-library/react"
 import App from '../App'
-
 
 jest.mock('../assets/react.svg', () => 'test-file-stub');
 
-test('demo', () => {
-    expect(true).toBe(true)
+
+describe('App page test', ()=>{
+
+    test("Renders the main page", () => {
+        const { getByText } = render(<App />);
+        const text:HTMLElement = getByText(/Select Complementary Color/);
+        expect(text).toBeInTheDocument();
+    })
+
+    test('Should show tradic button', ()=>{
+        render(<App />);
+        screen.getByText(/Select Next Triadic Color/);
+    })
+
+
+    test('Should increase hue shifting', ()=>{
+        render(<App />);
+        // document.getElementById()
+    })
+
 })
 
-test("Renders the main page", () => {
-    render(<App />)
-    expect(true).toBeTruthy()
-})

@@ -295,9 +295,9 @@ export default function MainPage(){
 
                         <div className='w-full h-6' style={{backgroundImage: `linear-gradient(to right, ${currentHexColorsArray.join(', ')})`}}></div>
 
-                        <div className='overflow-hidden flex justify-center items-center p-6  mx-12 aspect-square max-w-[20vw] w-full self-center rounded-md bg-gray-300' style={{boxShadow: '4px 4px 4px rgba(0,0,0, 0.25) inset', zIndex: 1}}>
+                        <div className='overflow-hidden flex justify-center items-center p-6  mx-12 aspect-square w-full max-w-4xl self-center rounded-md bg-gray-300' style={{boxShadow: '4px 4px 4px rgba(0,0,0, 0.25) inset', zIndex: 1}}>
                             {/* esfera */}
-                            <div className='relative w-full aspect-square rounded-full' style={{backgroundPosition: 'top left', backgroundImage: `radial-gradient(at 35% 35%, ${currentHexColorsArray.join(', ')})`}}>
+                            <div className='relative w-full max-w-sm aspect-square rounded-full' style={{backgroundPosition: 'top left', backgroundImage: `radial-gradient(at 35% 35%, ${currentHexColorsArray.join(', ')})`}}>
                                 {/* sombra */}
                                 <div className='absolute w-[80%] aspect-square rounded-full bottom-[-30%] right-0' style={{backgroundImage: 'radial-gradient(rgba(0,0,0, 1.0), rgba(0,0,0, 0.6), rgba(0,0,0, 0.3), transparent)', zIndex: -1, transform: 'scaleY(0.4)'}} />
                             </div>
