@@ -1,6 +1,7 @@
-import React from "react"
+import React from "react";
+import html2canvas from 'html2canvas';
 import { HslColor } from "react-colorful";
-import ColorBox from "./ColorBox"
+import ColorBox from "./ColorBox";
 import { hslToHex, hexToHsl } from '../tools/ColorTools';
 import { BiBookAdd } from "react-icons/bi";
 import { MdDeleteOutline } from "react-icons/md";
@@ -15,8 +16,10 @@ interface PaletteSection {
 
 
 export default function PaletteSection({ currentColorsArray, handleChangeCurrentColor }:PaletteSection){
+    const paletteDivRef = React.useRef<HTMLDivElement | null>(null);
     const [paletteColors, setPaletteColors] = React.useState<HslColor[][]>([])
     const inputImportPaletteRef = React.useRef<HTMLInputElement | null>(null);
+    const [isExportingImage, setIsExportingImage] = React.useState<boolean>(false); // precisa disso para nao exportar a paleta com os icones de excluir os gradientes
 
 
     function handleClickAddToColorPalette():void{
@@ -38,7 +41,36 @@ export default function PaletteSection({ currentColorsArray, handleChangeCurrent
     }
 
 
-    function handleClickExportColorPalette():void{
+    function handleClickExportColorPaletteImage():void{
+        setIsExportingImage(true)
+        return;
+    }
+
+    async function exportPaletteAsImage():Promise<void>{
+        if(paletteDivRef.current){
+            const canvas = await html2canvas(paletteDivRef.current, {
+                backgroundColor: null, // Fundo transparente
+            });
+
+            const image = canvas.toDataURL('image/png');
+            
+            const link = document.createElement('a');
+            link.href = image;
+            link.download = 'captura.png';
+            link.click();
+        }
+    }
+
+
+    React.useEffect(()=>{
+        if(isExportingImage){
+            exportPaletteAsImage()
+            setIsExportingImage(false)
+        }
+    }, [isExportingImage])
+
+
+    function handleClickExportColorPaletteText():void{
         let content:string = '';
         const paletteLastIdx:number = paletteColors.length - 1;
 
@@ -118,18 +150,21 @@ export default function PaletteSection({ currentColorsArray, handleChangeCurrent
             {
                 paletteColors.length > 0 &&
 
-                <div className='flex flex-wrap flex-col gap-1'>
+                <div className='flex flex-wrap flex-col gap-1' ref={paletteDivRef}>
                     {
                         paletteColors.map((gradient, key)=>{
                             return(
                                 <div key={key} className='flex gap-1 items-start'>
-                                    <div className='button-01 !bg-red-600' onClick={()=>{handleClickRemoveColorGradient(key)}}>
-                                        <MdDeleteOutline />
-                                    </div>
+                                    {
+                                        !isExportingImage &&
+                                        <div className='button-01 !bg-red-600' onClick={()=>{handleClickRemoveColorGradient(key)}}>
+                                            <MdDeleteOutline />
+                                        </div>
+                                    }
                                     <div className='flex max-w-[20vw] overflow-x-auto'>
                                         {
                                             gradient.map((color, key2)=>{
-                                                return <ColorBox key={key2} hslColor={color} hexColor={hslToHex(color)} handleChangeCurrentColor={handleChangeCurrentColor} />
+                                                return <ColorBox key={key2} hslColor={color} hexColor={hslToHex(color)} hasShadow={false} handleChangeCurrentColor={handleChangeCurrentColor} />
                                             })
                                         }
                                     </div>
@@ -142,12 +177,21 @@ export default function PaletteSection({ currentColorsArray, handleChangeCurrent
 
             {
                 paletteColors.length > 0 &&
-                <div className='flex gap-1 items-center mt-4'>
-                    <div className='button-01' onClick={handleClickExportColorPalette}>
-                        <BiExport  />
+                <>
+                    <div className='flex gap-1 items-center mt-4'>
+                        <div className='button-01' onClick={handleClickExportColorPaletteImage}>
+                            <BiExport  />
+                        </div>
+                        <p>Export Color Palette (.png)</p>
                     </div>
-                    <p>Export Color Palette</p>
-                </div>
+
+                    <div className='flex gap-1 items-center'>
+                        <div className='button-01' onClick={handleClickExportColorPaletteText}>
+                            <BiExport  />
+                        </div>
+                        <p>Export Color Palette (.txt)</p>
+                    </div>
+                </>
             }
 
             <div className='flex gap-1 items-center'>
