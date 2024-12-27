@@ -21,7 +21,7 @@ export default function MainPage(){
     const [selectedColorText, setSelectedColorText] = React.useState<string>('')
     
     const defaultHueShifting:number = 18.0;
-    const defaultSaturationShifting:number = 6.0;
+    const defaultSaturationShifting:number = 0.0; // 6.0
     const defaultLightnessShifting:number = 6.0;
 
     const [colorCount, setColorCount] = React.useState<number>(5)
@@ -220,7 +220,7 @@ export default function MainPage(){
 
                     <ConfigContainer label='Hue Shifting Value: ' type={'hue'} value={hueShifting} maxValue={40} step={2} setterFunction={handleConfigSliderChange} resetFunction={handleClickResetShiftingButton} />
                     
-                    <ConfigContainer label='Saturation Shifting Value: ' type={'sat'} value={saturationShifting} maxValue={30} step={2} setterFunction={handleConfigSliderChange} resetFunction={handleClickResetShiftingButton} />
+                    {/* <ConfigContainer label='Saturation Shifting Value: ' type={'sat'} value={saturationShifting} maxValue={30} step={2} setterFunction={handleConfigSliderChange} resetFunction={handleClickResetShiftingButton} /> */}
 
                     <ConfigContainer label='Lightness Shifting Value: ' type={'lig'} value={lightnessShifting} maxValue={20} step={2} setterFunction={handleConfigSliderChange} resetFunction={handleClickResetShiftingButton} />
                 </section>
