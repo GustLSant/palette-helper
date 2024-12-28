@@ -212,9 +212,9 @@ export default function MainPage(){
                     <div className='main-page__mini-section'>
                         <p className='text-lg'>Color Count in Gradient: </p>
                         <div className='flex gap-2 items-center'>
-                            <button className='button-01' onClick={()=>{handleClickButtonColorCount(-1)}}>&minus;</button>
-                            <p className='text-center text-xl'>{colorCount}</p>
-                            <button className='button-01' onClick={()=>{handleClickButtonColorCount(1)}}>+</button>
+                            <button data-testid={'buttonDecreaseColorCount'} className='button-01' onClick={()=>{handleClickButtonColorCount(-1)}}>&minus;</button>
+                            <p className='text-center text-xl' data-testid={'labelValueColorCount'}>{colorCount}</p>
+                            <button data-testid={'buttonIncreaseColorCount'} className='button-01' onClick={()=>{handleClickButtonColorCount(1)}}>+</button>
                         </div>
                     </div>
 
@@ -226,7 +226,7 @@ export default function MainPage(){
                 </section>
                 
                 <section className='flex flex-col gap-2'>
-                    <HslColorPicker className='grow !w-auto shadow-md' onMouseUp={()=>{setMouseUpWatcher((prev)=>{if(prev === 1000){return 0}else{return prev+1}})}} color={currentColor} onChange={(newColor:HslColor)=>{handleChangeCurrentColor(newColor)}} />
+                    <HslColorPicker className='!w-auto shadow-md' onMouseUp={()=>{setMouseUpWatcher((prev)=>{if(prev === 1000){return 0}else{return prev+1}})}} color={currentColor} onChange={(newColor:HslColor)=>{handleChangeCurrentColor(newColor)}} />
                     
                     <div className="main-page__mini-section">
                         <div className='flex flex-col gap-2'>
@@ -259,7 +259,7 @@ export default function MainPage(){
                             </div>
                         </div>
 
-                        <div className='flex justify-center max-w-[30vw] overflow-x-auto'>
+                        <div className='flex justify-center max-w-[30vw] overflow-x-auto' data-testid={'divCurrentColors'}>
                             {
                                 currentColorsArray.map((item, key)=>{
                                     return(

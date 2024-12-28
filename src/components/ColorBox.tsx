@@ -18,7 +18,7 @@ export default function ColorBox({hslColor, hexColor, handleChangeCurrentColor, 
 
     return(
         <div className="flex flex-col">
-            <div className={`w-8 h-8 hover:cursor-pointer ${(hasShadow) ? 'shadow-md' : ''}`} onClick={handleClickColor} style={{backgroundColor: hexColor}}></div>
+            <div className={`w-8 h-8 hover:cursor-pointer ${(hasShadow) ? 'shadow-md' : ''}`} onClick={handleClickColor} title={hexColor} style={{backgroundColor: hexColor}}></div>
             { isMainColor && <p className="text-black text-2xl text-center">^</p> }
         </div>
     )
