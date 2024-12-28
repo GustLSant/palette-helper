@@ -233,7 +233,7 @@ export default function MainPage(){
                             <p>Selected Color:</p>
                             <div className='flex gap-2 items-center'>
                                 <div className='w-8 h-8 shadow-md' style={{backgroundColor: hslToHex(currentColor)}} />
-                                <input type="text" className='bg-gray-300 rounded-sm p-1 px-2 focus:outline-none max-w-[150px]' value={selectedColorText} onChange={handleChangeInputSelectedColor} name="color-code-input" style={{boxShadow: '4px 4px 4px rgba(0,0,0, 0.2) inset'}} id="color-code-input" />
+                                <input data-testid={'textInputCurrentColor'} type="text" className='bg-gray-300 rounded-sm p-1 px-2 focus:outline-none max-w-[150px]' value={selectedColorText} onChange={handleChangeInputSelectedColor} name="color-code-input" style={{boxShadow: '4px 4px 4px rgba(0,0,0, 0.2) inset'}} id="color-code-input" />
                                 {/* <p>{hslToHex(currentColor)}</p> */}
                             </div>
                         </div>
@@ -248,14 +248,14 @@ export default function MainPage(){
                                     <p>Saturation:</p>
                                     <p>{currentColor.s}</p>
                                 </div>
-                                <input className='w-full' value={currentColor.s} onChange={handleChangeSliderSaturation} max={100} min={0} type="range" name="input-range-sat" id="input-range-sat" />
+                                <input data-testid={'sliderSaturation'} className='w-full' value={currentColor.s} onChange={handleChangeSliderSaturation} max={100} min={0} type="range" name="input-range-sat" id="input-range-sat" />
                             </div>
                             <div>
                                 <div className='flex justify-between'>
                                     <p>Lightness:</p>
                                     <p>{currentColor.l}</p>
                                 </div>
-                                <input className='w-full' value={currentColor.l} onChange={handleChangeSliderLightness} max={100} min={0} type="range" name="input-range-lig" id="input-range-lig" />
+                                <input data-testid={'sliderLightness'} className='w-full' value={currentColor.l} onChange={handleChangeSliderLightness} max={100} min={0} type="range" name="input-range-lig" id="input-range-lig" />
                             </div>
                         </div>
 
@@ -271,14 +271,14 @@ export default function MainPage(){
                         
 
                         <div className='flex p-1 gap-1 items-center'>
-                            <div className='button-01' onClick={handleClickSelectComplementary}>
+                            <div className='button-01' data-testid={'buttonComplementaryColor'} onClick={handleClickSelectComplementary}>
                                 <BiTransfer  />
                             </div>
                             <p>Select Complementary Color</p>
                         </div>
 
                         <div className='flex p-1 gap-1 items-center'>
-                            <div className='button-01' onClick={handleClickSelectTriadic}>
+                            <div className='button-01' data-testid={'buttonTriadicColor'} onClick={handleClickSelectTriadic}>
                                 <BiShapeTriangle  />
                             </div>
                             <p>Select Next Triadic Color</p>
@@ -295,7 +295,7 @@ export default function MainPage(){
 
                         <div className='w-full h-6' style={{backgroundImage: `linear-gradient(to right, ${currentHexColorsArray.join(', ')})`}}></div>
 
-                        <div className='overflow-hidden flex justify-center items-center p-6  mx-12 aspect-square w-full max-w-4xl self-center rounded-md bg-gray-300' style={{boxShadow: '4px 4px 4px rgba(0,0,0, 0.25) inset', zIndex: 1}}>
+                        <div className='overflow-hidden flex justify-center items-center p-6  mx-12 aspect-square w-full max-w-4xl self-center rounded-md bg-gray-300' style={{boxShadow: '4px 4px 4px rgba(0,0,0, 0.15) inset', zIndex: 1}}>
                             {/* esfera */}
                             <div className='relative w-full max-w-sm aspect-square rounded-full' style={{backgroundPosition: 'top left', backgroundImage: `radial-gradient(at 35% 35%, ${currentHexColorsArray.join(', ')})`}}>
                                 {/* sombra */}

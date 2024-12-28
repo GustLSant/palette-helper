@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react"
 import App from '../App'
 
 jest.mock('../assets/react.svg', () => 'test-file-stub');
+const defaultColor:string = '#1dc91d';
 
 
 describe('App page test', ()=>{
@@ -11,12 +12,6 @@ describe('App page test', ()=>{
         const { getByText } = render(<App />);
         const text:HTMLElement = getByText(/Select Complementary Color/);
         expect(text).toBeInTheDocument();
-    })
-
-
-    test('Should show Triadic button', ()=>{
-        render(<App />);
-        screen.getByText(/Select Next Triadic Color/);
     })
 
 
@@ -84,6 +79,66 @@ describe('App page test', ()=>{
         // reset to default value
         fireEvent.click(resetButton);
         expect(Number(labelValue.textContent)).toBe(6);
+    })
+
+
+    test('Should change Current Color (InputText, Triadic and Complementary Buttons)', ()=>{
+        render(<App />);
+
+        const complementaryButton:HTMLButtonElement = screen.getByTestId('buttonComplementaryColor');
+        const triadicButton:HTMLButtonElement = screen.getByTestId('buttonTriadicColor');
+        const textInputCurrentColor:HTMLInputElement = screen.getByTestId('textInputCurrentColor');
+
+        // default value
+        expect(textInputCurrentColor.value).toBe(defaultColor);
+        
+        // text input
+        fireEvent.change(textInputCurrentColor, {target: {value: '#ff0000'}});
+        expect(textInputCurrentColor.value).toBe('#ff0000');
+
+        // complementary button
+        fireEvent.click(complementaryButton);
+        expect(textInputCurrentColor.value).toBe('#00ffff');
+        fireEvent.click(complementaryButton);
+        expect(textInputCurrentColor.value).toBe('#ff0000');
+        
+        // triadic button
+        fireEvent.click(triadicButton);
+        expect(textInputCurrentColor.value).toBe('#00ff00');
+        fireEvent.click(triadicButton);
+        expect(textInputCurrentColor.value).toBe('#0000ff');
+        fireEvent.click(triadicButton);
+        expect(textInputCurrentColor.value).toBe('#ff0000');
+    })
+
+
+    test('Should change Current Color (Saturation and Lightness Sliders', ()=>{
+        render(<App />);
+
+        const textInputCurrentColor:HTMLInputElement = screen.getByTestId('textInputCurrentColor');
+        const sliderSaturation:HTMLInputElement = screen.getByTestId('sliderSaturation');
+        const sliderLightness:HTMLInputElement = screen.getByTestId('sliderLightness');
+
+        // sliders reading color changings
+        fireEvent.change(textInputCurrentColor, {target: {value: '#ff0000'}});
+        expect(Number(sliderSaturation.value)).toBe(100);
+        expect(Number(sliderLightness.value)).toBe(50);
+
+        // saturation slider
+        fireEvent.change(sliderSaturation, {target: {value: 50}});
+        expect(textInputCurrentColor.value).toBe('#bf4040');
+        expect(Number(sliderLightness.value)).toBe(50);
+        fireEvent.change(sliderSaturation, {target: {value: 100}});
+        expect(textInputCurrentColor.value).toBe('#ff0000');
+        expect(Number(sliderLightness.value)).toBe(50);
+
+        // ligtness slider
+        fireEvent.change(sliderLightness, {target: {value: 0}});
+        expect(textInputCurrentColor.value).toBe('#000000');
+        expect(Number(sliderSaturation.value)).toBe(100);
+        fireEvent.change(sliderLightness, {target: {value: 100}});
+        expect(textInputCurrentColor.value).toBe('#ffffff');
+        expect(Number(sliderSaturation.value)).toBe(100);
     })
 })
 
