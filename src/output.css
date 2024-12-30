@@ -575,19 +575,9 @@ video {
   margin-right: 3rem;
 }
 
-.my-\[-3rem\] {
-  margin-top: -3rem;
-  margin-bottom: -3rem;
-}
-
-.my-\[-1rem\] {
-  margin-top: -1rem;
-  margin-bottom: -1rem;
-}
-
-.my-\[-2rem\] {
-  margin-top: -2rem;
-  margin-bottom: -2rem;
+.my-\[-1\.75rem\] {
+  margin-top: -1.75rem;
+  margin-bottom: -1.75rem;
 }
 
 .mb-2 {
@@ -618,10 +608,6 @@ video {
   height: 2rem;
 }
 
-.min-h-28 {
-  min-height: 7rem;
-}
-
 .min-h-screen {
   min-height: 100vh;
 }
@@ -642,16 +628,12 @@ video {
   width: 100%;
 }
 
-.min-w-\[800px\] {
-  min-width: 800px;
+.min-w-\[750px\] {
+  min-width: 750px;
 }
 
-.max-w-\[20vw\] {
-  max-width: 20vw;
-}
-
-.max-w-\[30vw\] {
-  max-width: 30vw;
+.max-w-4xl {
+  max-width: 56rem;
 }
 
 .max-w-\[150px\] {
@@ -662,32 +644,12 @@ video {
   max-width: 2000px;
 }
 
-.max-w-\[256px\] {
-  max-width: 256px;
+.max-w-\[20vw\] {
+  max-width: 20vw;
 }
 
-.max-w-\[512px\] {
-  max-width: 512px;
-}
-
-.max-w-\[300px\] {
-  max-width: 300px;
-}
-
-.max-w-3xl {
-  max-width: 48rem;
-}
-
-.max-w-4xl {
-  max-width: 56rem;
-}
-
-.max-w-xl {
-  max-width: 36rem;
-}
-
-.max-w-md {
-  max-width: 28rem;
+.max-w-\[30vw\] {
+  max-width: 30vw;
 }
 
 .max-w-sm {
@@ -758,20 +720,16 @@ video {
   align-self: center;
 }
 
+.overflow-auto {
+  overflow: auto;
+}
+
 .overflow-hidden {
   overflow: hidden;
 }
 
 .overflow-x-auto {
   overflow-x: auto;
-}
-
-.overflow-x-hidden {
-  overflow-x: hidden;
-}
-
-.overflow-x-scroll {
-  overflow-x: scroll;
 }
 
 .rounded-full {
@@ -824,12 +782,22 @@ video {
   padding-right: 1rem;
 }
 
-.pb-6 {
-  padding-bottom: 1.5rem;
+.py-\[1rem\] {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 
-.pb-4 {
+.py-4 {
+  padding-top: 1rem;
   padding-bottom: 1rem;
+}
+
+.pb-2 {
+  padding-bottom: 0.5rem;
+}
+
+.pb-6 {
+  padding-bottom: 1.5rem;
 }
 
 .text-center {
@@ -841,9 +809,9 @@ video {
   line-height: 2rem;
 }
 
-.text-5xl {
-  font-size: 3rem;
-  line-height: 1;
+.text-4xl {
+  font-size: 2.25rem;
+  line-height: 2.5rem;
 }
 
 .text-lg {
@@ -948,14 +916,8 @@ video {
   outline-offset: 2px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 750px) {
   .md\:hidden {
-    display: none;
-  }
-}
-
-@media (min-width: 976px) {
-  .lg\:hidden {
     display: none;
   }
 }

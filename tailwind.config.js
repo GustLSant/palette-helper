@@ -6,7 +6,7 @@ export default {
     
     screens: { // definicoes dos tamanhos das telas para aplicar diferentes estilos (aqui estah sobrescrevendo, o tailwind ja possui essas propriedades)
       sm: '480px',
-      md: '768px',
+      md: '750px',
       lg: '976px',
       xl: '1440px',
     },

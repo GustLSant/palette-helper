@@ -140,5 +140,26 @@ describe('App page test', ()=>{
         expect(textInputCurrentColor.value).toBe('#ffffff');
         expect(Number(sliderSaturation.value)).toBe(100);
     })
+
+
+    test('Should update previews', ()=>{
+        render(<App />);
+
+        const textInputCurrentColor:HTMLInputElement = screen.getByTestId('textInputCurrentColor');
+        const divPreviewRect:HTMLDivElement = screen.getByTestId('previewGradientRect');
+        const divPreviewSphere:HTMLDivElement = screen.getByTestId('previewGradientSphere');
+
+        // default color
+        expect(divPreviewRect).toHaveStyle({ backgroundImage: `linear-gradient(to right, rgb(162, 228, 63), rgb(93, 224, 36), rgb(29, 201, 29), rgb(25, 174, 70), rgb(21, 147, 97))` })
+        expect(divPreviewSphere).toHaveStyle({ backgroundImage: `radial-gradient(at 30% 30%, rgb(162, 228, 63), rgb(93, 224, 36), rgb(29, 201, 29), rgb(25, 174, 70), rgb(21, 147, 97))` })
+
+        // new color
+        fireEvent.change(textInputCurrentColor, {target: {value: '#ff0000'}});
+        expect(divPreviewRect).toHaveStyle({ backgroundImage: `linear-gradient(to right, rgb(255, 177, 61), rgb(255, 98, 31), rgb(255, 0, 0), rgb(224, 0, 67), rgb(194, 0, 116))` })
+        expect(divPreviewSphere).toHaveStyle({ backgroundImage: `radial-gradient(at 30% 30%, rgb(255, 177, 61), rgb(255, 98, 31), rgb(255, 0, 0), rgb(224, 0, 67), rgb(194, 0, 116))` })
+    })
+
+
+    
 })
 
