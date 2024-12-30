@@ -275,7 +275,7 @@ export default function MainPage(){
                                 </div>
                             </div>
 
-                            <div className='flex justify-center max-w-[30vw] overflow-x-auto' data-testid={'divCurrentColors'}>
+                            <div className='flex justify-center max-w-full overflow-x-auto' data-testid={'divCurrentColors'}>
                                 {
                                     currentColorsArray.map((item, key)=>{
                                         return(

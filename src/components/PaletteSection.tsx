@@ -161,7 +161,7 @@ export default function PaletteSection({ currentColorsArray, handleChangeCurrent
                                             <MdDeleteOutline />
                                         </div>
                                     }
-                                    <div className='flex max-w-[20vw] overflow-x-auto'>
+                                    <div className='flex max-w-full overflow-x-auto'>
                                         {
                                             gradient.map((color, key2)=>{
                                                 return <ColorBox key={key2} hslColor={color} hexColor={hslToHex(color)} hasShadow={false} handleChangeCurrentColor={handleChangeCurrentColor} />
