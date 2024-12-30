@@ -154,7 +154,7 @@ export default function PaletteSection({ currentColorsArray, handleChangeCurrent
                     {
                         paletteColors.map((gradient, key)=>{
                             return(
-                                <div key={key} className='flex gap-1 items-start'>
+                                <div key={key} className='flex gap-1 items-start max-w-full'>
                                     {
                                         !isExportingImage &&
                                         <div className='button-01 !bg-red-600' onClick={()=>{handleClickRemoveColorGradient(key)}}>
