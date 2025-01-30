@@ -207,11 +207,11 @@ export default function MainPage(){
 
     return(
         <div className='flex flex-col'>
-            <div className='flex justify-center items-center bg-white shadow-md mb-6'>
+            <div className='flex justify-center items-center bg-white shadow-md'>
                 <h1 className='text-4xl text-center py-4'>Palette Helper</h1>
             </div>
 
-            <div className='overflow-auto pb-2 flex flex-col gap-4' ref={divContainerGeneral}>
+            <div className='overflow-auto pb-2 flex flex-col gap-4 pt-6' ref={divContainerGeneral}>
                 <div className='flex md:hidden gap-2 justify-center font-sm w-full min-w-[750px]'>
                     <p>&#10218;</p>
                     <p>Horizontal Scroll</p>

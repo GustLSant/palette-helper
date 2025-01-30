@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./src/**/*.{html,tsx,ts,jsx,js}'],
+  content: ['./src/**/*.{html,tsx,ts,jsx,js}', './index.html'],
   theme: {
     // se quisesse sobrescrever todas as cores do tailwind, colocaria as cores nesse nivel de chave aqui
     
