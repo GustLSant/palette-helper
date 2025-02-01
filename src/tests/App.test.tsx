@@ -47,28 +47,37 @@ describe('App page test', ()=>{
     test('Should change Hue Shifting Value', ()=>{
         render(<App />);
 
-        const slider = screen.getByTestId('sliderhue');
-        const labelValue = screen.getByTestId('labelValuehue');
-        const resetButton = screen.getByTestId('buttonResethue')
+        const sliderLightHue = screen.getByTestId('slider-lgh-hue');
+        const sliderDarkHue = screen.getByTestId('slider-drk-hue');
+        const labelValueLight = screen.getByTestId('labelValue-lgh-hue');
+        const labelValueDark = screen.getByTestId('labelValue-drk-hue');
+        const resetButtonLight = screen.getByTestId('buttonReset-lgh-hue')
+        const resetButtonDark = screen.getByTestId('buttonReset-drk-hue')
 
         // default value
-        expect(Number(labelValue.textContent)).toBe(18);
+        expect(Number(labelValueLight.textContent)).toBe(16);
+        expect(Number(labelValueDark.textContent)).toBe(16);
 
-        fireEvent.change(slider, { target: { value: 10 } });
-        expect(Number(labelValue.textContent)).toBe(10);
+        // change event
+        fireEvent.change(sliderLightHue, { target: { value: 10 } });
+        fireEvent.change(sliderDarkHue, { target: { value: 12 } });
+        expect(Number(labelValueLight.textContent)).toBe(10);
+        expect(Number(labelValueDark.textContent)).toBe(12);
 
         // reset to default value
-        fireEvent.click(resetButton);
-        expect(Number(labelValue.textContent)).toBe(18);
+        fireEvent.click(resetButtonLight);
+        fireEvent.click(resetButtonDark);
+        expect(Number(labelValueLight.textContent)).toBe(16);
+        expect(Number(labelValueDark.textContent)).toBe(16);
     })
 
 
     test('Should change Lightness Shifting Value', ()=>{
         render(<App />);
 
-        const slider = screen.getByTestId('sliderlig');
-        const labelValue = screen.getByTestId('labelValuelig');
-        const resetButton = screen.getByTestId('buttonResetlig')
+        const slider = screen.getByTestId('slider-lig');
+        const labelValue = screen.getByTestId('labelValue-lig');
+        const resetButton = screen.getByTestId('buttonReset-lig')
 
         // default value
         expect(Number(labelValue.textContent)).toBe(6);

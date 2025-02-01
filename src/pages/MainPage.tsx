@@ -12,20 +12,23 @@ import { BiShapeTriangle } from "react-icons/bi";
 // hue do amarelo: 60
 // hue do azul: 240
 
+export type TypeConfigSlideChange = 'lgh-hue' | 'drk-hue' | 'sat' | 'lig'
+
 
 export default function MainPage(){
     const [currentColor, setCurrentColor] = React.useState<HslColor>({h: 120.0, s: 75.0, l: 45.0})
     const [currentColorsArray, setCurrentColorsArray] = React.useState<HslColor[]>([])
     const [currentHexColorsArray, setCurrentHexColorsArray] = React.useState<string[]>([])
-    const [mouseUpWatcher, setMouseUpWatcher] = React.useState<number>(0)
+    const [mouseUpWatcher, setMouseUpWatcher] = React.useState<number>(0) // state para verificar se o mouse selecionou (soltou o click, e n arrastou) uma cor no picker (para atualizar o historico de cores)
     const [selectedColorText, setSelectedColorText] = React.useState<string>('')
     
-    const defaultHueShifting:number = 18.0;
+    const defaultHueShifting:number = 16.0;
     const defaultSaturationShifting:number = 0.0; // 6.0
     const defaultLightnessShifting:number = 6.0;
 
     const [colorCount, setColorCount] = React.useState<number>(5)
-    const [hueShifting, setHueShifting] = React.useState<number>(defaultHueShifting)
+    const [lightHueShifting, setLightHueShifting] = React.useState<number>(defaultHueShifting)
+    const [darkHueShifting, setDarkHueShifting] = React.useState<number>(defaultHueShifting)
     const [saturationShifting, setSaturationShifting] = React.useState<number>(defaultSaturationShifting)
     const [lightnessShifting, setLightnessShifting] = React.useState<number>(defaultLightnessShifting)
 
@@ -43,16 +46,18 @@ export default function MainPage(){
         if (clockwise < counterClockwise) { hueDirection = 1.0 * _lighterOrDarker; } // a cor esta a esquerda do amarelo
         else { hueDirection = -1.0 * _lighterOrDarker; }                             // a cor esta a direita do amarelo
 
-        const absoluteShiftedHue:number = (_originalColor.h + hueShifting*_step*hueDirection); // hue sem respeitar o limite 0 ~ 360
+        
         let normalizedShiftedHue:number = 0.0;
 
         if(_lighterOrDarker > 0){ // clareando
+            const absoluteShiftedHue:number = (_originalColor.h + lightHueShifting*_step*hueDirection); // hue sem respeitar o limite 0 ~ 360
             // limitando o valor do hue para o amarelo mesmo fora do intervalo [0-360] // intervalo geral do amarelo: -60 ~ 0 ~ 60 ~ 420
             if(_originalColor.h < 60.0){ normalizedShiftedHue = clamp(absoluteShiftedHue, -60.0, 60.0); }
             else if(_originalColor.h > 60.0){ normalizedShiftedHue = clamp(absoluteShiftedHue, 60.0, 420.0); }
             else{ normalizedShiftedHue = 60.0; }
         }
         else{ // escurecendo
+            const absoluteShiftedHue:number = (_originalColor.h + darkHueShifting*_step*hueDirection); // hue sem respeitar o limite 0 ~ 360
             // limitando o valor do hue para o azul mesmo fora do intervalo [0-360] // intervalo geral do azul: -240 ~ 0 ~ 240 ~ 480
             if(_originalColor.h < 240.0){ normalizedShiftedHue = clamp(absoluteShiftedHue, -240.0, 240.0); }
             else if(_originalColor.h > 240.0){ normalizedShiftedHue = clamp(absoluteShiftedHue, 240.0, 480.0); }
@@ -71,7 +76,7 @@ export default function MainPage(){
     }
 
 
-    function handleChangeCurrentColor(_newColor:HslColor, _updateMouseUpWatcher:boolean=false):void{
+    function handleChangeCurrentColor(_newColor:HslColor, _forceColorHistoricUpdate:boolean=false):void{
         setCurrentColor(_newColor)
         const newCurrentColorsArray:HslColor[] = []
         const middleIdx:number = Math.floor(colorCount/2.0)
@@ -91,7 +96,7 @@ export default function MainPage(){
 
         setSelectedColorText(hslToHex(_newColor));
 
-        if(_updateMouseUpWatcher){ setMouseUpWatcher((prev)=>{if(prev === 1000){return 0}else{return prev+1}}) }
+        if(_forceColorHistoricUpdate){ setMouseUpWatcher((prev)=>{if(prev === 1000){return 0}else{return prev+1}}) } // o mouseUpWatcher eh oq determina quando o user selecionou uma cor no picker, e so adiciona uma cor no historico quando isso acontece
     }
 
 
@@ -101,10 +106,14 @@ export default function MainPage(){
         setColorCount((prev)=>{return prev+_increment})
     }
 
-    function handleConfigSliderChange(_shiftingType:string, value:number):void{
+    function handleConfigSliderChange(_shiftingType:TypeConfigSlideChange, value:number):void{
         switch(_shiftingType){
-            case 'hue' : {
-                setHueShifting(value);
+            case 'lgh-hue' : {
+                setLightHueShifting(value);
+                break;
+            }
+            case 'drk-hue' : {
+                setDarkHueShifting(value);
                 break;
             }
             case 'sat' : {
@@ -123,8 +132,12 @@ export default function MainPage(){
     }
     function handleClickResetShiftingButton(_shiftingType:string):void{
         switch(_shiftingType){
-            case 'hue' : {
-                setHueShifting(defaultHueShifting);
+            case 'lgh-hue' : {
+                setLightHueShifting(defaultHueShifting);
+                break;
+            }
+            case 'drk-hue' : {
+                setDarkHueShifting(defaultHueShifting);
                 break;
             }
             case 'sat' : {
@@ -144,8 +157,8 @@ export default function MainPage(){
 
 
     React.useEffect(()=>{
-        handleChangeCurrentColor(currentColor) // atualizando a cor atual apos mudar o tamanho do gradiente
-    }, [colorCount, hueShifting, saturationShifting, lightnessShifting])
+        handleChangeCurrentColor(currentColor) // atualizando a cor atual
+    }, [colorCount, lightHueShifting, darkHueShifting, saturationShifting, lightnessShifting])
 
 
     function handleChangeSliderSaturation(e:React.ChangeEvent<HTMLInputElement>):void{
@@ -184,7 +197,7 @@ export default function MainPage(){
             l: currentColor.l
         }
         newColor.h = getAbsoluteHueValue(newColor.h + 180);
-        handleChangeCurrentColor(newColor, true);
+        handleChangeCurrentColor(newColor, false); // passa true no segundo argumento para considerar essa mudanca de cor como se fosse uma mudanca do picker
     }
     function handleClickSelectTriadic():void{
         const newColor:HslColor = {
@@ -193,7 +206,7 @@ export default function MainPage(){
             l: currentColor.l
         }
         newColor.h = getAbsoluteHueValue(newColor.h + 120);
-        handleChangeCurrentColor(newColor, true);
+        handleChangeCurrentColor(newColor, false); // passa true no segundo argumento para considerar essa mudanca de cor como se fosse uma mudanca do picker
     }
 
 
@@ -233,8 +246,10 @@ export default function MainPage(){
                             </div>
                         </div>
 
-                        <ConfigContainer label='Hue Shifting Value: ' type={'hue'} value={hueShifting} maxValue={40} step={2} setterFunction={handleConfigSliderChange} resetFunction={handleClickResetShiftingButton} />
+                        <ConfigContainer label='Lighter Hue Shifting Value: ' type={'lgh-hue'} value={lightHueShifting} maxValue={40} step={2} setterFunction={handleConfigSliderChange} resetFunction={handleClickResetShiftingButton} />
                         
+                        <ConfigContainer label='Darker Hue Shifting Value: ' type={'drk-hue'} value={darkHueShifting} maxValue={40} step={2} setterFunction={handleConfigSliderChange} resetFunction={handleClickResetShiftingButton} />
+
                         {/* <ConfigContainer label='Saturation Shifting Value: ' type={'sat'} value={saturationShifting} maxValue={30} step={2} setterFunction={handleConfigSliderChange} resetFunction={handleClickResetShiftingButton} /> */}
 
                         <ConfigContainer label='Lightness Shifting Value: ' type={'lig'} value={lightnessShifting} maxValue={20} step={2} setterFunction={handleConfigSliderChange} resetFunction={handleClickResetShiftingButton} />

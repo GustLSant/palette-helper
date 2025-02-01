@@ -1,14 +1,15 @@
 import React from "react";
+import { TypeConfigSlideChange } from '../pages/MainPage'
 import { BiReset } from "react-icons/bi";
 
 
 interface ConfigContainerProps {
     label:string;
-    type:string; // 'hue' 'sat' 'lig'
+    type:TypeConfigSlideChange; // 'hue' 'sat' 'lig'
     value:number;
     maxValue:number;
     step: number;
-    setterFunction: (_type:string, _value:number) => void;
+    setterFunction: (_type:TypeConfigSlideChange, _value:number) => void;
     resetFunction: (_type:string) => void;
 }
 
@@ -23,9 +24,9 @@ export default function ConfigContainer({label, type, value, maxValue, step, set
             <p className='text-lg'>{ label }</p>
             
             <div className='flex gap-2 items-center'>
-                <input data-testid={'slider'+type} className="grow" type="range" value={value} max={maxValue} step={step} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setterFunction(type, Number(e.target.value))}} /> 
-                <p data-testid={'labelValue'+type}>{value}</p>
-                <button data-testid={'buttonReset'+type} className='button-01' onClick={()=>{resetFunction(type)}}><BiReset /></button>
+                <input data-testid={'slider-'+type} className="grow" type="range" value={value} max={maxValue} step={step} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setterFunction(type, Number(e.target.value))}} /> 
+                <p data-testid={'labelValue-'+type}>{value}</p>
+                <button data-testid={'buttonReset-'+type} className='button-01' onClick={()=>{resetFunction(type)}}><BiReset /></button>
             </div>
 
         </div>
