@@ -6,7 +6,7 @@ import './output.css'
 
 function App(){
   return(
-    <div className='min-h-screen max-w-[2000px] pb-6 bg-gray-200'>
+    <div className='min-h-screen max-w-[2000px] m-auto pb-6 bg-gray-200'>
       <MainPage />
     </div>
   )
